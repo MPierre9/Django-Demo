@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreateData</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet"  href="{% static 'polls/css/Login-Form-Clean.css' %}">
+    <link rel="stylesheet"  href="{% static 'polls/css/styles.css' %}">
+</head>
+<body>
+    <div class="login-clean">
+        <form>
+            <p class="centerP">Django Demo App</p>
+            <h2 class="sr-only">Login Form</h2>
+            <div class="form-group boxed">
+              <p class="paddingDesc">Work Item 1</hp>
+              <p class="desc paddingDesc">CRUD using just Django and html (no JS)</p>
+              <div class="paddingButton">
+                <a class="btn btn-primary btn-block paddingButton" href="{% url 'list' %}">View Employees</a>
+              </div>
+           </div>
+           <div class="form-group boxed">
+              <p class="paddingDesc">Work Item 2</hp>
+              <p class="desc paddingDesc">CRUD using Django and AJAX to form submissions + models</p>
+              <div class="paddingButton">
+                <a class="btn btn-primary btn-block paddingButton" href="{% url 'list-ajax' %}">View Employees</a>
+              </div>
+           </div>
+           </div>         
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

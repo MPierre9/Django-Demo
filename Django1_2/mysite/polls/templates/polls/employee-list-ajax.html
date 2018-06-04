@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreateData</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet"  href="{% static 'polls/css/ajaxcss.css' %}">
+    <link rel="stylesheet"  href="{% static 'polls/css/styles.css' %}">
+</head>
+<body>
+    <div class="login-clean">
+        <p class="centerP">Django Demo App</p>
+        <div>
+            <p>Employee List with AJAX</p>
+            {% if latest_employee_list %}
+            <table  class="table table-bordered employeeTable">
+                    <tr>
+                        <th>Id</th>
+                        <th>Employee Name</th>
+                        <th>Job Title</th>
+                        <th>Hire Date</th>
+                        <th>Delete/Update</th>
+                    </tr>
+                {% for employee in latest_employee_list %}
+                    <tr id="employee_{{ employee.id }}" >
+                        <td id="employeeId_{{ employee.id }}">{{ employee.id }}</td>
+                        <td id="employeeName_{{ employee.id }}"><a href="{% url 'detail' employee.id %}">{{ employee.employee_name }}</a></td>
+                        <td id="jobTitle_{{ employee.id }}">{{ employee.job_title }}</td>
+                        <td id="hireDate_{{ employee.id }}">{{ employee.hire_date }}</td>
+                        <td><a id="delemployee_{{ employee.id }}" ><img src="{% static 'polls/images/delete.png' %}" alt="delete" height="15px" width="15px"></img></a><a id="editemployee_{{ employee.id }}" style="padding-left:24px;" ><img src="{% static 'polls/images/edit.png' %}" alt="edit" height="15px" width="15px"></img></a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <button id="createEmployee" class="btn btn-primary btn-block" class="btn btn-default">Create Employee</button>
+            <a href="/polls/" class="btn btn-default">Return home</a>
+            {% else %}
+        <p>No polls are available.</p>
+        <button id="createEmployee" class="btn btn-primary btn-block" class="btn btn-default">Create Employee</button>
+        <a href="/polls/" class="btn btn-default">Return home</a>
+    {% endif %}  
+        </div>
+    </div>
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    {% block javascript %}
+        <script>
+            
+            jQuery.expr[':'].regex = function(elem, index, match) {
+                var matchParams = match[3].split(','),
+                validLabels = /^(data|css):/,
+                attr = {
+                    method: matchParams[0].match(validLabels) ? 
+                    matchParams[0].split(':')[0] : 'attr',
+                    property: matchParams.shift().replace(validLabels,'')
+                },
+                regexFlags = 'ig',
+                regex = new RegExp(matchParams.join('').replace(/^\s+|\s+$/g,''), regexFlags);
+                return regex.test(jQuery(elem)[attr.method](attr.property));
+            }
+
+            $("#createEmployee").click(function () {
+                if($("#newEmp").length ==0) {
+                    $( ".employeeTable" ).append( "<tr id='newEmp'><td><button onclick='createEmployee()'>Save</button></td><td><input type='text' id='empName' onkeyup='getEmpName()'></td><td><input type='text' id='jobTitle' onkeyup='getJobTitle()'></td><td><input type='text' id='hireDate' onkeyup='getHireDate()'></td><td><a id='newDel' ><img src='{% static 'polls/images/delete.png' %}' alt='delete' height='15px' width='15px'></img></a></td></tr>" );           
+                }
+            });
+
+            $("#empName").click( function () { 
+                console.log("empName pressed");
+            });
+            
+            function createEmployee() {
+                console.info("Create Employee - " + employeeName + ", " + jobTitle + ", " + hireDate);
+                $.ajax({
+                    url: '{% url "createAjax" %}',
+                    data: {
+                        'employee_name': employeeName,
+                        'job_title': jobTitle,
+                        'hire_date': hireDate
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        console.info(data.successCode);
+                        if(data.successCode==1337) {
+                            console.info(data.empName + " -- " + data.jobTitle + " -- " + data.hireDate);
+                            $("#newEmp").remove();
+                            $(".employeeTable").append("<tr id='employee_"+ data.empId+"'><td id='employeeId_"+data.empId+"'>"+data.empId+"</td><td id='employeeName_" + data.empId +"'><a href='/polls/"+data.empId+"'>"+ data.empName +"</a></td><td id='jobTitle_"+ data.empId +"'>"+ data.jobTitle +  "</td><td id='hireDate_" + data.empId + "'>"+ data.hireDate +"</td><td><a id='delemployee_" + data.empId +"' class='test'><img src='{% static 'polls/delete.png' %}' alt='delete' height='15px' width='15px'></img></a><a id='editemployee_"+ data.empId + "' style='padding-left:24px;' ><img src='{% static 'polls/images/edit.png' %}' alt='edit' height='15px' width='15px'></img></a></td></tr>");
+                        } else {
+                        }
+                    }
+                });
+            }
+            var employeeEditId = "n/a";
+            $(document).on("click", ':regex(id,^newDel)' ,function(){
+                $("#newEmp").remove();
+            });
+
+
+            $(document).on("click", ':regex(id,^editemployee)' ,function(){
+                if($(".empEditOpen").length ==0) {
+                    var empIdSplit = $(this).attr('id').split("_");
+                    var employeeId = empIdSplit[1];  
+                    employeeEditId = employeeId;
+                    console.info($("#employee_"+employeeId).children()[0]);
+                    // Child 1 = Employee name, Child 2 = Job title, Child 3 = Hire date
+                    var empId = $("#employee_"+employeeId).children().eq(0);
+                    var empName = $("#employee_"+employeeId).children().eq(1);
+                    var jobTitle = $("#employee_"+employeeId).children().eq(2);
+                    var hireDate = $("#employee_"+employeeId).children().eq(3);
+                
+                    empId.html("<button onclick='saveEmployee()'>Save</button>");
+                    empName.html("<input type='text' id='empName' class='empEditOpen' onkeyup='getEmpName()' value='" + empName.text() +"'>");
+                    jobTitle.html("<input type='text' id='jobTitle' onkeyup='getJobTitle()' value='" + jobTitle.text() +"'>");
+                    hireDate.html("<input type='text' id='hireDate' onkeyup='getHireDate()' value='1997-02-11'>");
+                }
+             });
+
+
+            $(document).on("click", ':regex(id,^delemployee)' ,function(){
+                var empIdSplit = $(this).attr('id').split("_");
+                var employeeId = empIdSplit[1];
+
+                $.ajax({
+                    url: '{% url "deleteAjax" %}',
+                    data: {
+                        'employee_id': employeeId
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        console.info(data.successCode);
+                        if(data.successCode==1337) {
+                            $("#employee_"+employeeId).remove();
+                        } else {
+                        }
+                    }
+                });
+            });
+    
+            function saveEmployee() { 
+                var empName =  $("#employeeName_"+employeeEditId).children().eq(0).val();
+                var jobTitle = $("#jobTitle_"+employeeEditId).children().eq(0).val();
+                var hireDate = $("#hireDate_"+employeeEditId).children().eq(0).val();
+                $.ajax({
+                    url: '{% url "editAjax" %}',
+                    data: {
+                        'employee_id': employeeEditId,
+                        'employee_name':empName,
+                        'job_title': jobTitle,
+                        'hire_date': hireDate
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        console.info(data.successCode);
+                        if(data.successCode==1337) {
+                            console.info(data.empName + " -- " + data.jobTitle + " -- " + data.hireDate);
+                            $("#employeeId_"+employeeEditId).children().eq(0).replaceWith(data.empId);
+                            $("#employeeName_"+employeeEditId).children().eq(0).replaceWith("<a href='/polls/"+data.empId+"'>"+ data.empName +"</a>");
+                            $("#jobTitle_"+employeeEditId).children().eq(0).replaceWith(data.jobTitle);
+                            $("#hireDate_"+employeeEditId).children().eq(0).replaceWith(data.hireDate);
+
+                        } else {
+                        }
+                    }
+                });
+            }
+
+            function getEmpName() { 
+                 console.info("Employee Name: "+ $("#empName").val());
+                 employeeName = $("#empName").val(); 
+            }
+            function getJobTitle() { 
+                 console.info("Job Title: "+ $("#jobTitle").val());
+                 jobTitle = $("#jobTitle").val();
+            }
+            function getHireDate() { 
+                 console.info("Hire Date: "+ $("#hireDate").val());
+                 hireDate = $("#hireDate").val();
+            }
+
+        </script>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreateData</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet"  href="{% static 'polls/css/Login-Form-Clean.css' %}">
+    <link rel="stylesheet"  href="{% static 'polls/css/styles.css' %}">
+</head>
+<body>
+    <div class="login-clean">
+        <p class="centerP">Django Demo App</p>
+        <div class="illustration"></div>
+        <form>
+            <p>Employee List</p>
+            {% if latest_employee_list %}
+            <table  class="table table-bordered">
+                    <tr>
+                        <th>Id</th>
+                        <th>Employee Name</th>
+                        <th>Job Title</th>
+                        <th>Hire Date</th>
+                    </tr>
+                {% for employee in latest_employee_list %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td><a href="{% url 'detail' employee.id %}">{{ employee.employee_name }}</a></td>
+                        <td>{{ employee.job_title }}</td>
+                        <td>{{ employee.hire_date }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <a class="btn btn-primary btn-block" href="/polls/create" class="btn btn-default">Create Employee</a>
+            <a href="/polls/" class="btn btn-default">Return home</a>
+            <a href="/polls/list/ajax" class="btn btn-default">Go to Employee list with AJAX</a>
+
+            {% else %}
+        <p>No polls are available.</p>
+        <a class="btn btn-primary btn-block" href="/polls/create" class="btn btn-default">Create Employee</a>
+        <a href="/polls/" class="btn btn-default">Return home</a>
+        <a href="/polls/list/ajax" class="btn btn-default">Go to Employee list with AJAX</a>
+
+    {% endif %}  
+    </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

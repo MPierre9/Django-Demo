@@ -1,0 +1,29 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreateData</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet"  href="{% static 'polls/css/Login-Form-Clean.css' %}">
+    <link rel="stylesheet"  href="{% static 'polls/css/styles.css' %}">
+</head>
+<body>
+    <div class="login-clean">
+        <form action="{% url 'create' %}" method="post">
+            <p class="centerP">Django Demo App</p>
+            <p class="centerP2">Create Poll</p>
+            <div class="illustration"></div>
+            <div class="form-group">
+              {% csrf_token %}
+              {{ form }}
+              <input class="btn btn-primary btn-block" style="background: #00c853; padding-bottom:35px;" type="submit" value="Create">
+              <a class="" href="/polls/list/" class="btn btn-default">Back to Employees</a>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
